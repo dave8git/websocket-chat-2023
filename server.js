@@ -16,11 +16,10 @@ io.on('connection', (socket) => {
 
     socket.on('join', (userName) => {
         users.push({ name: userName, id: socket.id });
-        socket.broadcast.emit('addUser', {
+        socket.broadcast.emit('message', {
           author: 'Chat-Bot',
           userName: `${userName} has joined the conversation`
         })
- 
     });
     
     socket.on('message', (message) => {

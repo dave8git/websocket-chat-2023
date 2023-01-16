@@ -1,9 +1,10 @@
 const socket = io(); 
 socket.on('message', ({author, content}) => addMessage(author, content));
-  socket.on('addUser', ({ author, userName }) => {
-    const content = userName + ' has joined the conversation!'
-    addMessage(author, content);
-  });
+// socket.on('addUser', ({ author, userName }) => {
+//   const content = userName + ' has joined the conversation!'
+//   addMessage(author, content);
+// });
+
 
 const loginForm = document.getElementById('welcome-form');
 const messagesSection = document.getElementById('messages-section');
