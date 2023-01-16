@@ -12,14 +12,13 @@ app.use(express.static(path.join(__dirname, '/client')));
 const io = socket(server);
 const messages = [];
 const users = [];
-
 io.on('connection', (socket) => {
 
     socket.on('join', (userName) => {
         users.push({ name: userName, id: socket.id });
         socket.broadcast.emit('addUser', {
           author: 'Chat-Bot',
-          content: `${userName} has joined the conversation`
+          userName: `${userName} has joined the conversation`
         })
  
     });
@@ -29,7 +28,16 @@ io.on('connection', (socket) => {
         messages.push(message);
         socket.broadcast.emit('message', message);
     });
-})
+
+    socket.on('disconnect', () => {
+        const user = users.find(user => user.id === socket.id);
+        console.log(user);
+        if(user) {
+            socket.broadcast.emit('message', { author: 'Chat-Bot', content: `${user.name} has left the conversation :(`});
+            users.splice(user, 1);
+        }
+    });
+});
 
 console.log(users);
 
