@@ -1,3 +1,9 @@
+const socket = io(); 
+socket.on('message', ({author, content}) => addMessage(author, content));
+  socket.on('addUser', ({ author, userName }) => {
+    const content = userName + ' has joined the conversation!'
+    addMessage(author, content);
+  });
 
 const loginForm = document.getElementById('welcome-form');
 const messagesSection = document.getElementById('messages-section');
@@ -7,6 +13,7 @@ const userNameInput = document.getElementById('username');
 const messageContentInput = document.getElementById('message-content');
 
 let userName;
+console.log(userName);
 loginForm.addEventListener('submit', event => login(event));
 addMessageForm.addEventListener('submit', event => sendMessage(event));
 
@@ -19,6 +26,7 @@ function login(event) {
         console.log(userName);
         loginForm.classList.remove('show');
         messagesSection.classList.add('show');
+        socket.emit('join', userName);
     } else {
         alert('Proszę coś wpisać, cokolwiek ;)')
     }
@@ -26,30 +34,35 @@ function login(event) {
 
 function sendMessage(e) {
     e.preventDefault();  
-
-    if(messageContentInput.value === '') {
+    let messageContent = messageContentInput.value;
+    console.log(messageContent);
+    if(messageContent === '') {
         alert('Please write something?!');
     } else {
-        addMessage(userName, messageContentInput.value); 
+        addMessage(userName, messageContent); 
+        socket.emit('message', {author: userName, content: messageContent});
         messageContentInput.value = '';
     }
+
+   
 }
 
-function addMessage(author, content) {
-    const message = document.createElement('li');
-    const messageAuthor = document.createElement('h3');
-    const messageContent = document.createElement('div');
 
+const addMessage = (author, content) => {
+    const message = document.createElement('li');
     message.classList.add('message');
     message.classList.add('message--received');
-    if(author === userName) message.classList.add('message--self');
-    messageAuthor.classList.add('message__author');
-    messageContent.classList.add('message__content');
-    message.innerHTML = `
-      <h3 class="message__author">${userName === author ? 'You' : author }</h3>
-      <div class="message__content">
-        ${content}
-      </div>
-    `;
-    messagesList.appendChild(message);
-  }
+    if (author === userName) {
+        message.classList.add('message--self')
+    } else if (author === 'Chat-Bot') {
+        message.classList.add('bot')
+    }
+    message.innerHTML +=
+        `<h3 class="message__author">${author === userName ? 'You' : author}</h3>
+        <div class="message__content"> ${content} </div>`
+
+    messagesList.appendChild(message)
+};
+
+
+  
