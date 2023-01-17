@@ -18,7 +18,7 @@ io.on('connection', (socket) => {
         users.push({ name: userName, id: socket.id });
         socket.broadcast.emit('message', {
           author: 'Chat-Bot',
-          userName: `${userName} has joined the conversation`
+          content: `${userName} has joined the conversation`
         })
     });
     
